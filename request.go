@@ -39,8 +39,12 @@ func NewRequest(data []byte) (*Request, error) {
 	dictLen := uint32(len(request.Dictionary))
 
 	for idx, val := range request.TimerValue {
-		tags := make(Tags, int(request.TimerTagCount[idx]))
-		tagIdx := 0
+		tags := make(Tags, int(request.TimerTagCount[idx])+3)
+		tags[0] = Tag{Key: "host", Value: request.Hostname}
+		tags[1] = Tag{Key: "server", Value: request.ServerName}
+		tags[2] = Tag{Key: "script", Value: request.ScriptName}
+
+		tagIdx := 3
 		for valIdx, keyIdx := range request.TimerTagName[offset : offset+int(request.TimerTagCount[idx])] {
 			if keyIdx >= dictLen || request.TimerTagValue[offset+valIdx] >= dictLen {
 				continue
