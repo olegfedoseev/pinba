@@ -21,7 +21,7 @@ func TestValidRequest(t *testing.T) {
 	//		pinba.Tag{Key:"req_tag1", Value:"req_val1"},
 	//		pinba.Tag{Key:"req_tag2", Value:"req_val2"}
 	// }
-	assert.Equal(t, 5, len(request.Tags))
+	assert.Equal(t, 6, len(request.Tags))
 
 	host, err := request.Tags.Get("host")
 	assert.Nil(t, err)

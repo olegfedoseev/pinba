@@ -4,6 +4,7 @@ package pinba
 
 import (
 	proto "github.com/olegfedoseev/pinba/request"
+	"strconv"
 )
 
 // Request wraps "raw" protobuf request and add convinient structs for Tags and Timers
@@ -22,13 +23,14 @@ func NewRequest(data []byte) (*Request, error) {
 		return nil, err
 	}
 
-	request.Tags = make(Tags, 3+len(request.TagValue))
+	request.Tags = make(Tags, 4+len(request.TagValue))
 	request.Tags[0] = Tag{Key: "host", Value: request.Hostname}
 	request.Tags[1] = Tag{Key: "server", Value: request.ServerName}
 	request.Tags[2] = Tag{Key: "script", Value: request.ScriptName}
+	request.Tags[3] = Tag{Key: "status", Value: strconv.Itoa(int(request.Status))}
 
 	for idx, val := range request.TagValue {
-		request.Tags[3+idx] = Tag{
+		request.Tags[4+idx] = Tag{
 			Key:   request.Dictionary[request.TagName[idx]],
 			Value: request.Dictionary[val],
 		}
@@ -39,12 +41,13 @@ func NewRequest(data []byte) (*Request, error) {
 	dictLen := uint32(len(request.Dictionary))
 
 	for idx, val := range request.TimerValue {
-		tags := make(Tags, int(request.TimerTagCount[idx])+3)
+		tags := make(Tags, int(request.TimerTagCount[idx])+4)
 		tags[0] = Tag{Key: "host", Value: request.Hostname}
 		tags[1] = Tag{Key: "server", Value: request.ServerName}
 		tags[2] = Tag{Key: "script", Value: request.ScriptName}
+		tags[3] = Tag{Key: "status", Value: strconv.Itoa(int(request.Status))}
 
-		tagIdx := 3
+		tagIdx := 4
 		for valIdx, keyIdx := range request.TimerTagName[offset : offset+int(request.TimerTagCount[idx])] {
 			if keyIdx >= dictLen || request.TimerTagValue[offset+valIdx] >= dictLen {
 				continue
@@ -52,7 +55,8 @@ func NewRequest(data []byte) (*Request, error) {
 			// Skip "global" tags
 			if request.Dictionary[keyIdx] == "host" ||
 				request.Dictionary[keyIdx] == "server" ||
-				request.Dictionary[keyIdx] == "script" {
+				request.Dictionary[keyIdx] == "script" ||
+				request.Dictionary[keyIdx] == "status" {
 				continue
 			}
 
