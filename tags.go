@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"sort"
+	"strings"
 )
 
 type Tag struct {
@@ -81,4 +82,14 @@ func (tags Tags) String() string {
 		buf.WriteString(tag.Value)
 	}
 	return buf.String()
+}
+
+// Stringf will return tags as formated string, with given format
+// {xxx} will be replaced with value of tag xxx
+func (tags Tags) Stringf(format string) string {
+	result := format
+	for _, tag := range tags {
+		result = strings.Replace(result, "{"+tag.Key+"}", tag.Value, -1)
+	}
+	return result
 }

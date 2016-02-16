@@ -34,6 +34,18 @@ func TestTagsFilter(t *testing.T) {
 	assert.Equal(t, "bbb=val2", tags.Filter([]string{"aaa", "bbb"}).String())
 }
 
+func TestTagsStringf(t *testing.T) {
+	tags := Tags{Tag{"aaa", "val1"}, Tag{"bbb", "val2"}, Tag{"ccc", "val3"}}
+
+	assert.Equal(t,
+		"val1.requests.val2.script",
+		tags.Stringf("{aaa}.requests.{bbb}.script"))
+
+	assert.Equal(t,
+		"val1.requests.val2.script.{xxx}",
+		tags.Stringf("{aaa}.requests.{bbb}.script.{xxx}"))
+}
+
 func BenchmarkFilter(b *testing.B) {
 	b.ResetTimer()
 
@@ -54,5 +66,14 @@ func BenchmarkFilter(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		tags.Filter(filter)
+	}
+}
+
+func BenchmarkStringf(b *testing.B) {
+	b.ResetTimer()
+
+	tags := Tags{Tag{"aaa", "val1"}, Tag{"bbb", "val2"}, Tag{"ccc", "val3"}}
+	for i := 0; i < b.N; i++ {
+		tags.Stringf("{aaa}.requests.{bbb}.script")
 	}
 }
