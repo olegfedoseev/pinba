@@ -35,11 +35,13 @@ func TestValidRequest(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "index.php", script)
 
-	t.Logf("request.Timers: %#v", request.Timers)
-
 	script, err = request.Timers[0].Tags.Get("script")
 	assert.Nil(t, err)
 	assert.Equal(t, "index.php", script)
+
+	tag1, err := request.Timers[0].Tags.Get("req_tag1")
+	assert.Nil(t, err)
+	assert.Equal(t, "req_val1", tag1)
 
 	// pinba.Timers{
 	//	pinba.Timer{
