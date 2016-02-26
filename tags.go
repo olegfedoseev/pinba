@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// How many tags we can have. OpenTSDB limits it to 8, so let it be 16 :)
+const MAX_TAGS = 16
+
 type Tag struct {
 	Key   string
 	Value string
@@ -34,7 +37,8 @@ func (tags Tags) Get(key string) (string, error) {
 func (tags Tags) Filter(filter []string) Tags {
 	// First we count how many tags will be in result
 	cnt := 0
-	for _, tag := range tags {
+	indexes := make([]int, MAX_TAGS)
+	for idx, tag := range tags {
 		// Always skip empty tags
 		if tag.Value == "" {
 			continue
@@ -42,6 +46,7 @@ func (tags Tags) Filter(filter []string) Tags {
 
 		for _, f := range filter {
 			if f == tag.Key {
+				indexes[cnt] = idx
 				cnt++
 				break
 			}
@@ -50,20 +55,8 @@ func (tags Tags) Filter(filter []string) Tags {
 
 	// Then allocate only what we need, and loop once again to fill result
 	result := make(Tags, cnt)
-	cnt = 0
-	for _, tag := range tags {
-		// Always skip empty tags
-		if tag.Value == "" {
-			continue
-		}
-
-		for _, f := range filter {
-			if f == tag.Key {
-				result[cnt] = tag
-				cnt++
-				break
-			}
-		}
+	for n, idx := range indexes[:cnt] {
+		result[n] = tags[idx]
 	}
 	return result
 }
