@@ -77,3 +77,23 @@ func BenchmarkStringf(b *testing.B) {
 		tags.Stringf("{aaa}.requests.{bbb}.script")
 	}
 }
+
+func BenchmarkString(b *testing.B) {
+	tags := Tags{
+		Tag{"key1", "val1"},
+		Tag{"key2", ""},
+		Tag{"key3", "val3"},
+		Tag{"key4", "val4"},
+		Tag{"key5", "val5"},
+		Tag{"key6", ""},
+		Tag{"key7", ""},
+		Tag{"key8", "val8"},
+		Tag{"key9", "val9"},
+		Tag{"key10", "val10"},
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		tags.String()
+	}
+}
