@@ -7,19 +7,21 @@ import (
 	"strings"
 )
 
-// How many tags we can have. OpenTSDB limits it to 8, so let it be 16 :)
-const MAX_TAGS = 16
+// MaxTags is how many tags we can have. OpenTSDB limits it to 8, so let it be 16 :)
+const MaxTags = 16
 
+// Tag is pair of key and value
 type Tag struct {
 	Key   string
 	Value string
 }
 
+// Tags is a list of tags
 type Tags []Tag
 
-func (t Tags) Len() int           { return len(t) }
-func (t Tags) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
-func (t Tags) Less(i, j int) bool { return t[i].Key < t[j].Key }
+func (tags Tags) Len() int           { return len(tags) }
+func (tags Tags) Swap(i, j int)      { tags[i], tags[j] = tags[j], tags[i] }
+func (tags Tags) Less(i, j int) bool { return tags[i].Key < tags[j].Key }
 
 // Get will return value of tag by given key or error if no such tag exists
 func (tags Tags) Get(key string) (string, error) {
@@ -31,13 +33,22 @@ func (tags Tags) Get(key string) (string, error) {
 	return "", errors.New("no such tag")
 }
 
+// GetMap will tags as map
+func (tags Tags) GetMap() map[string]string {
+	result := map[string]string{}
+	for _, tag := range tags {
+		result[tag.Key] = tag.Value
+	}
+	return result
+}
+
 // Filter will filter (surprise :) tags by given keys, and return new Tags slice
 // Code a bit strange, but that way we don't need to use append and it's almost
 // twice as fast (480ns/op vs. 800ns/op)
 func (tags Tags) Filter(filter []string) Tags {
 	// First we count how many tags will be in result
 	cnt := 0
-	indexes := make([]int, MAX_TAGS)
+	indexes := make([]int, MaxTags)
 	for idx, tag := range tags {
 		// Always skip empty tags
 		if tag.Value == "" {

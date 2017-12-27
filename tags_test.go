@@ -70,9 +70,20 @@ func BenchmarkFilter(b *testing.B) {
 }
 
 func BenchmarkStringf(b *testing.B) {
-	b.ResetTimer()
+	tags := Tags{
+		Tag{"key1", "val1"},
+		Tag{"key2", ""},
+		Tag{"aaa", "val3"},
+		Tag{"key4", "val4"},
+		Tag{"key5", "val5"},
+		Tag{"key6", ""},
+		Tag{"key7", ""},
+		Tag{"key8", "val8"},
+		Tag{"bbb", "val9"},
+		Tag{"key10", "val10"},
+	}
 
-	tags := Tags{Tag{"aaa", "val1"}, Tag{"bbb", "val2"}, Tag{"ccc", "val3"}}
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tags.Stringf("{aaa}.requests.{bbb}.script")
 	}
